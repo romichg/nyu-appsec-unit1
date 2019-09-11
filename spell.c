@@ -10,7 +10,7 @@ extern int hash_function(const char* word);
 
 int read_word(FILE* fp, char* buf) {
 
-    printf("%s\n", "Reading word");
+    //printf("%s\n", "Reading word");
 
     char c;
     int strindex = 0;
@@ -42,7 +42,7 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
     FILE* word_list;
     word_list = fopen(dictionary_file, "r"); //Try to open the wordlist file
     if (word_list == NULL) {
-        printf("%s", "Failed to open dictionary file\n");
+        //printf("%s", "Failed to open dictionary file\n");
         return false;
     }
     int count=0;
@@ -51,12 +51,12 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
     n->next=NULL;
     while (read_word(word_list, n->word) != EOF) {
         if (n->word == NULL) {
-            printf("%s\n", "NULL word detected..fishy-fishy..moving on");
+            //printf("%s\n", "NULL word detected..fishy-fishy..moving on");
             continue;
         }
         count++;
         bucket = hash_function(n->word);
-        printf("%s: %s %s: %d\n", "Loaded word", n->word, "bucket", bucket);
+        //printf("%s: %s %s: %d\n", "Loaded word", n->word, "bucket", bucket);
         if (hashtable[bucket] != NULL) {
             n->next=hashtable[bucket];
             hashtable[bucket]=n;
@@ -67,7 +67,7 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
         n->next=NULL;
 }
 
-    printf ("%s%d\n", "Loaded dictionary word count: ", count);
+    //printf ("%s%d\n", "Loaded dictionary word count: ", count);
     fclose(word_list);
     return true;
 }
@@ -103,7 +103,7 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
     char word[LENGTH];
     while (read_word(fp, word) != EOF) {
         //now lets prepare the word we will be checking
-        printf("%s: %s\n", "Original  word: ", word);
+        //printf("%s: %s\n", "Original  word: ", word);
 
         char final_word[LENGTH];
 
@@ -148,13 +148,13 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
         }
         final_word[b]='\0';
 
-        printf("%s: %s\n", "Final word: ", final_word);
+        //printf("%s: %s\n", "Final word: ", final_word);
 
         if (check_word(final_word, hashtable) == true) {
-            printf("%s %s\n", final_word, "is correct");
+            //printf("%s %s\n", final_word, "is correct");
         }
         else {
-            printf("%s %s\n", final_word, "is wrong");
+            //printf("%s %s\n", final_word, "is wrong");
             misspelled[bad_word_count]=malloc(sizeof(char) * strlen(final_word));
             strcpy(misspelled[bad_word_count], final_word);
             bad_word_count++;
