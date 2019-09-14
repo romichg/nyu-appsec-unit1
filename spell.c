@@ -33,6 +33,7 @@ int read_word(FILE* fp, char* buf) {
         strindex++;
         read_count++;
     }
+    return -5;
 }
 
 bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
