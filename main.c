@@ -35,5 +35,14 @@ int main(int argc, char* argv[]) {
     for (int i=0; i<bad_word_count; i++) {
         printf ("%s: %s\n", "Bad Word", misspelled[i]);
     }
+
+    // lets free all the memory related in misspelled array
+    for (int i=0; i<bad_word_count; i++) {
+       free(misspelled[i]);
+    }
+
+    // and lets close our files
+    fclose(text_check);
+
     return  0;
 }

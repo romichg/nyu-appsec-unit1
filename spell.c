@@ -8,6 +8,18 @@
 
 extern int hash_function(const char* word);
 
+void freebucket(node* n) {
+    if (n->next != NULL) {
+        freebucket(n->next); // look ma, I remember recursion. "I, wanna recurse my list on that link-list node, recurse until I can't recurse no more :)"
+        free(n); // free the current node after return
+        return;
+    }
+    else {
+        free (n); // this is when we can't recurse no more, so we free the node
+        return;
+    }
+}
+
 int read_word(FILE* fp, char* buf) {
 
     //printf("%s\n", "Reading word");
@@ -16,7 +28,7 @@ int read_word(FILE* fp, char* buf) {
     int strindex = 0;
     int read_count = 0;
     while((c = fgetc(fp))) { //look ma, we can read infinity here
-        if(c == ' ' || c == '\n' || c == '\t' || c == EOF) { //we found a space on an EOF
+        if(c == ' ' || c == '\n' || c == '\t' || c == EOF) { //we found a space or an EOF
             if ( strindex <= LENGTH + 1 && strindex > 0) //aint nobody overflowing this buff
                 buf[strindex] = '\0'; // terminate the string
             if (c == EOF && strindex == 0)
@@ -66,7 +78,9 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
         }
         n = malloc(sizeof(node));
         n->next=NULL;
-}
+    }
+    // we should free n, in case nothing is read;
+    free (n);
 
     //printf ("%s%d\n", "Loaded dictionary word count: ", count);
     fclose(word_list);
@@ -98,7 +112,6 @@ bool check_word(const char* word, hashmap_t hashtable[]) {
 
 int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
     int bad_word_count=0;
-
 
     //reading our file one word at a time
     char word[LENGTH];
@@ -156,12 +169,18 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
         }
         else {
             //printf("%s %s\n", final_word, "is wrong");
-            misspelled[bad_word_count]=malloc(sizeof(char) * strlen(final_word));
+            misspelled[bad_word_count]=malloc(sizeof(char) * strlen(final_word) + 1); //gota make sure to add 1 here to account for \0
             strcpy(misspelled[bad_word_count], final_word);
             bad_word_count++;
         }
 
     }
+    //release memory before we return
+    for (int i=0; i<HASH_SIZE; i++)  {
+        if (hashtable[i] != NULL)
+            freebucket(hashtable[i]);
+    }
 
     return bad_word_count;
 }
+
