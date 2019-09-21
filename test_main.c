@@ -4,6 +4,7 @@
 
 #define DICTIONARY "texts/wordlist.txt"
 #define TESTDICT "texts/test_worlist.txt"
+#define TESTDICT_OVERFLOW "texts/test_overflow_worlist.txt"
 
 START_TEST(test_dictionary_normal)
     {
@@ -26,6 +27,24 @@ START_TEST(test_dictionary_normal)
     }
 END_TEST
 
+START_TEST(test_dictionary_overflow)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        ck_assert(load_dictionary(TESTDICT_OVERFLOW, hashtable));
+        const char* words[3];
+        int bucket=-1;
+        words[0] ="Supercalifragilisticexpialidocious";
+        words[1] ="super";
+        words[2] ="accommodation";
+        for (int i=0; i < 3; i++) {
+            bucket=hash_function(words[i]); // We are re-using the hashfunction on purpose. See below
+            ck_assert_str_eq(words[i],hashtable[bucket]->word);
+        }
+        // Here we are repeating the last test but our wordlist includes a superlong word.
+        // We want to make sure it is ignored an no buffer is overflown
+    }
+END_TEST
+
 START_TEST(test_check_word_normal)
 {
     hashmap_t hashtable[HASH_SIZE];
@@ -38,7 +57,7 @@ START_TEST(test_check_word_normal)
 }
 END_TEST
 
-START_TEST(test_check_word_normal_punctuation)
+START_TEST(test_check_word_normal_punctuation_middle)
     {
         hashmap_t hashtable[HASH_SIZE];
         load_dictionary(DICTIONARY, hashtable);
@@ -75,6 +94,43 @@ START_TEST(test_check_words_normal)
     }
 END_TEST
 
+START_TEST(test_check_words_punctuation_begining_ending)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        load_dictionary(DICTIONARY, hashtable);
+        char *misspelled[MAX_MISSPELLED];
+        FILE *fp = fopen("texts/test3.txt", "r");
+        int num_misspelled = check_words(fp, hashtable, misspelled);
+        ck_assert_msg(num_misspelled == 0);
+        // Here we are testing if the word has punctuation.
+        // Punctuation in the beginning of the word should get striped out and word should be ok
+        // Punctuation in the end of the word should get striped out and word should be ok
+    }
+END_TEST
+
+
+START_TEST(test_check_words_spaces_numbers_special_chars)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        load_dictionary(DICTIONARY, hashtable);
+        char* expected[2];
+        expected[0] = "2343gawre324";
+        expected[1] = "2432super234";
+        char *misspelled[MAX_MISSPELLED];
+        FILE *fp = fopen("texts/test2.txt", "r");
+        int num_misspelled = check_words(fp, hashtable, misspelled);
+        ck_assert_msg(num_misspelled == 2);
+        ck_assert_msg(strcmp(misspelled[0], expected[0]) == 0);
+        ck_assert_msg(strcmp(misspelled[1], expected[1]) == 0);
+
+        // A word with all numbers should be considered correct
+        // A bunch of spaces and tabs should not be a word and should be ignored
+        // A word with all special characters or punctuation should be ignored
+        // A word with numbers and letters should be incorrect
+
+    }
+END_TEST
+
 
 START_TEST(test_check_word_buffer_overflow)
 {
@@ -96,10 +152,13 @@ check_word_suite(void)
     suite = suite_create("check_word");
     check_word_case = tcase_create("Core");
     tcase_add_test(check_word_case, test_dictionary_normal);
+    tcase_add_test(check_word_case, test_dictionary_overflow);
     tcase_add_test(check_word_case, test_check_word_normal);
-    tcase_add_test(check_word_case, test_check_word_normal_punctuation);
+    tcase_add_test(check_word_case, test_check_word_normal_punctuation_middle);
     tcase_add_test(check_word_case, test_check_word_buffer_overflow);
     tcase_add_test(check_word_case, test_check_words_normal);
+    tcase_add_test(check_word_case, test_check_words_punctuation_begining_ending);
+    tcase_add_test(check_word_case, test_check_words_spaces_numbers_special_chars);
     suite_add_tcase(suite, check_word_case);
 
     return suite;
