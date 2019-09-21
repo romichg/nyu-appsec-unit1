@@ -121,17 +121,27 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
 
         char final_word[LENGTH];
 
+        //if the word is all numbers it is a correct word, shortcut
+        int isallnum=1;
+        for (int i=0; i<strlen(word); i++) {
+            if (!isdigit(word[i])) {
+                isallnum=0;
+                break;
+            }
+        }
+        if (isallnum == 1)
+            continue;
 
         //inspect the string left to right
         int word_len=strlen(word);
         char lr_stage_word[word_len];
         int j=0;
-        int alpha_flag1=0;
+        int alphanum_flag1=0;
         for(int i = 0; i<word_len; i++) {
-            if (!isalpha(word[i]) && alpha_flag1 == 0 ) //first chars are not alpha, ignoring
+            if (!isalpha(word[i]) && !isdigit(word[i]) && alphanum_flag1 == 0 ) //first chars are not alpha, ignoring
                 continue;
             else
-                alpha_flag1=1;
+                alphanum_flag1=1;
 
             lr_stage_word[j++]=word[i];
         }
@@ -143,12 +153,12 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
         int lr_stage_word_len=strlen(lr_stage_word);
         char rl_stage_word[lr_stage_word_len];
         int y=0;
-        int alpha_flag2=0;
+        int alphanum_flag2=0;
         for (int x = lr_stage_word_len - 1; x>=0; x--) {
-            if (!isalpha(lr_stage_word[x]) && alpha_flag2 == 0 ) //last chars are not alpha, ignoring
+            if (!isalpha(lr_stage_word[x]) && !isdigit(lr_stage_word[x]) && alphanum_flag2 == 0  ) //last chars are not alpha, ignoring
                 continue;
             else
-                alpha_flag2=1;
+                alphanum_flag2=1;
 
             rl_stage_word[y++]=lr_stage_word[x];
         }
@@ -163,6 +173,10 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
         final_word[b]='\0';
 
         //printf("%s: %s\n", "Final word: ", final_word);
+
+        //don't check if final word is blank
+        if (strlen(final_word) == 0)
+            continue;
 
         if (check_word(final_word, hashtable) == true) {
             //printf("%s %s\n", final_word, "is correct");
