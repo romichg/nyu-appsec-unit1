@@ -28,6 +28,8 @@ int read_word(FILE* fp, char* buf) {
     int strindex = 0;
     int read_count = 0;
     while((c = fgetc(fp))) { //look ma, we can read infinity here
+        if (c != EOF && (!(0 < c < 128) )) //ignore all non ascii and null character input but catch EOF
+            continue;
         if(c == ' ' || c == '\n' || c == '\t' || c == EOF) { //we found a space or an EOF
             if ( strindex <= LENGTH + 1 && strindex > 0) //aint nobody overflowing this buff
                 buf[strindex] = '\0'; // terminate the string
