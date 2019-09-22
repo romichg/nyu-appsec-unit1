@@ -185,9 +185,12 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
         }
         else {
             //printf("%s %s\n", final_word, "is wrong");
-            misspelled[bad_word_count]=malloc(sizeof(char) * strlen(final_word) + 1); //gota make sure to add 1 here to account for \0
-            strcpy(misspelled[bad_word_count], final_word);
-            bad_word_count++;
+            if ( bad_word_count < 1000) { //make sure we are not overflowing the misspelled buffer with all those creative spellings
+                misspelled[bad_word_count] = malloc(
+                        sizeof(char) * strlen(final_word) + 1); //gota make sure to add 1 here to account for \0
+                strcpy(misspelled[bad_word_count], final_word);
+                bad_word_count++;
+            }
         }
 
     }

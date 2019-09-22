@@ -144,6 +144,43 @@ START_TEST(test_check_word_buffer_overflow)
 }
 END_TEST
 
+START_TEST(test_check_words_alice_in_wonderland)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        load_dictionary(DICTIONARY, hashtable);
+        char *misspelled[MAX_MISSPELLED];
+        FILE *fp = fopen("texts/alice.txt", "r");
+        int num_misspelled = check_words(fp, hashtable, misspelled);
+        ck_assert_msg(num_misspelled == 1000);
+        // Here we are testing if for a really long text and also over 1000 misspelled words
+    }
+END_TEST
+
+START_TEST(test_check_words_onegin_english)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        load_dictionary(DICTIONARY, hashtable);
+        char *misspelled[MAX_MISSPELLED];
+        FILE *fp = fopen("texts/onegin_j.txt", "r");
+        int num_misspelled = check_words(fp, hashtable, misspelled);
+        ck_assert_msg(num_misspelled == 1000);
+        // Here we are testing if for some poetry and a really long misspelled list
+    }
+END_TEST
+
+START_TEST(test_check_words_onegin_russian)
+    {
+        hashmap_t hashtable[HASH_SIZE];
+        load_dictionary(DICTIONARY, hashtable);
+        char *misspelled[MAX_MISSPELLED];
+        FILE *fp = fopen("texts/onegin_r.txt", "r");
+        int num_misspelled = check_words(fp, hashtable, misspelled);
+        ck_assert_msg(num_misspelled == 1000);
+        // Here we are testing if for same poetry in cyrillic characters
+    }
+END_TEST
+
+
 Suite *
 check_word_suite(void)
 {
@@ -159,6 +196,9 @@ check_word_suite(void)
     tcase_add_test(check_word_case, test_check_words_normal);
     tcase_add_test(check_word_case, test_check_words_punctuation_begining_ending);
     tcase_add_test(check_word_case, test_check_words_spaces_numbers_special_chars);
+    tcase_add_test(check_word_case, test_check_words_alice_in_wonderland);
+    tcase_add_test(check_word_case, test_check_words_onegin_english);
+    tcase_add_test(check_word_case, test_check_words_onegin_russian);
     suite_add_tcase(suite, check_word_case);
 
     return suite;
