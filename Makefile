@@ -24,7 +24,13 @@ prog: dictionary.o spell.o main.o
 	gcc -Wall -o spell_check dictionary.o spell.o main.o
 
 clean:
-	rm dictionary.o spell.o main.o test_main.o check_spell.o dictionary.h.gch 
+	rm dictionary.o spell.o main.o test_main.o check_spell.o dictionary.h.gch dictionary.gcno spell.gcno dictionary.gcda spell.gcda test_main.gcno test_main.gcda coverage.info
 	
 cleanall: clean 
 	rm spell_check spell_test
+
+codecov: 
+	gcc --coverage -Wall -o spell_test_coverage test_main.c spell.c dictionary.c dictionary.h -lcheck -lm -lrt -lpthread -lsubunit
+	./spell_test_coverage
+	lcov --capture --directory ./ --output-file coverage.info
+	genhtml coverage.info --output-directory code_coverage 

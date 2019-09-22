@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage.info - nyu-appsec-unit1/spell.c</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">nyu-appsec-unit1</a> - spell.c<span style="font-size: 80%;"> (source / <a href="spell.c.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">107</td>
+            <td class="headerCovTableEntry">110</td>
+            <td class="headerCovTableEntryHi">97.3 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2019-09-21 23:38:10</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : #include &lt;stdbool.h&gt;</a>
+<span class="lineNum">       2 </span>            : #include &lt;stdio.h&gt;
+<span class="lineNum">       3 </span>            : #include &lt;stdlib.h&gt;
+<span class="lineNum">       4 </span>            : #include &lt;string.h&gt;
+<span class="lineNum">       5 </span>            : #include &lt;ctype.h&gt;
+<span class="lineNum">       6 </span>            : #include &quot;dictionary.h&quot;
+<span class="lineNum">       7 </span>            : 
+<span class="lineNum">       8 </span>            : 
+<a name="9"><span class="lineNum">       9 </span>            : extern int hash_function(const char* word);</a>
+<span class="lineNum">      10 </span>            : 
+<span class="lineNum">      11 </span><span class="lineCov">     738786 : void freebucket(node* n) {</span>
+<span class="lineNum">      12 </span><span class="lineCov">     738786 :     if (n-&gt;next != NULL) {</span>
+<span class="lineNum">      13 </span><span class="lineCov">     727476 :         freebucket(n-&gt;next); // look ma, I remember recursion. &quot;I, wanna recurse my list on that link-list node, recurse until I can't recurse no more :)&quot;</span>
+<span class="lineNum">      14 </span><span class="lineCov">     727476 :         free(n); // free the current node after return</span>
+<span class="lineNum">      15 </span><span class="lineCov">     727476 :         return;</span>
+<span class="lineNum">      16 </span>            :     }
+<span class="lineNum">      17 </span>            :     else {
+<span class="lineNum">      18 </span><span class="lineCov">      11310 :         free (n); // this is when we can't recurse no more, so we free the node</span>
+<span class="lineNum">      19 </span><span class="lineCov">      11310 :         return;</span>
+<span class="lineNum">      20 </span>            :     }
+<a name="21"><span class="lineNum">      21 </span>            : }</a>
+<span class="lineNum">      22 </span>            : 
+<span class="lineNum">      23 </span><span class="lineCov">    1201278 : int read_word(FILE* fp, char* buf) {</span>
+<span class="lineNum">      24 </span>            : 
+<span class="lineNum">      25 </span>            :     //printf(&quot;%s\n&quot;, &quot;Reading word&quot;);
+<span class="lineNum">      26 </span>            : 
+<span class="lineNum">      27 </span>            :     char c;
+<span class="lineNum">      28 </span><span class="lineCov">    1201278 :     int strindex = 0;</span>
+<span class="lineNum">      29 </span><span class="lineCov">    1201278 :     int read_count = 0;</span>
+<span class="lineNum">      30 </span><span class="lineCov">   11681913 :     while((c = fgetc(fp))) { //look ma, we can read infinity here</span>
+<span class="lineNum">      31 </span><span class="lineCov">   11681913 :         if (c != EOF &amp;&amp; (!((0 &lt; c ) &amp;&amp; (c &lt; 128)) )) //ignore all non ascii and null character input but catch EOF</span>
+<span class="lineNum">      32 </span><span class="lineCov">     449692 :             continue;</span>
+<span class="lineNum">      33 </span><span class="lineCov">   11232221 :         if(c == ' ' || c == '\n' || c == '\t' || c == EOF) { //we found a space or an EOF</span>
+<span class="lineNum">      34 </span><span class="lineCov">    1320423 :             if ( strindex &lt;= LENGTH + 1 &amp;&amp; strindex &gt; 0) //aint nobody overflowing this buff</span>
+<span class="lineNum">      35 </span><span class="lineCov">    1201256 :                 buf[strindex] = '\0'; // terminate the string</span>
+<span class="lineNum">      36 </span><span class="lineCov">    1320423 :             if (c == EOF &amp;&amp; strindex == 0)</span>
+<span class="lineNum">      37 </span><span class="lineCov">         17 :                 return EOF;</span>
+<span class="lineNum">      38 </span><span class="lineCov">    1320406 :             else if ( strindex == 0)</span>
+<span class="lineNum">      39 </span><span class="lineCov">     119145 :                 continue;</span>
+<span class="lineNum">      40 </span>            :             else
+<span class="lineNum">      41 </span><span class="lineCov">    1201261 :                 return strindex;</span>
+<span class="lineNum">      42 </span>            :         }
+<span class="lineNum">      43 </span>            :         else // this is not a space or EOF so we gonna treatz it as partz of da word here
+<span class="lineNum">      44 </span><span class="lineCov">    9911798 :             if (strindex &lt;= LENGTH) //look ma, we wanna make sure nobody overflows the buff</span>
+<span class="lineNum">      45 </span><span class="lineCov">    9911557 :                 buf[strindex]=c;</span>
+<span class="lineNum">      46 </span>            : 
+<span class="lineNum">      47 </span><span class="lineCov">    9911798 :         strindex++;</span>
+<span class="lineNum">      48 </span><span class="lineCov">    9911798 :         read_count++;</span>
+<span class="lineNum">      49 </span>            :     }
+<span class="lineNum">      50 </span><span class="lineNoCov">          0 :     return -5;</span>
+<a name="51"><span class="lineNum">      51 </span>            : }</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">         11 : bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {</span>
+<span class="lineNum">      54 </span><span class="lineCov">      22011 :     for (int i=0; i&lt;HASH_SIZE; i++) //init the hashtable to null</span>
+<span class="lineNum">      55 </span><span class="lineCov">      22000 :         hashtable[i]=NULL;</span>
+<span class="lineNum">      56 </span>            : 
+<span class="lineNum">      57 </span>            :     FILE* word_list;
+<span class="lineNum">      58 </span><span class="lineCov">         11 :     word_list = fopen(dictionary_file, &quot;r&quot;); //Try to open the wordlist file</span>
+<span class="lineNum">      59 </span><span class="lineCov">         11 :     if (word_list == NULL) {</span>
+<span class="lineNum">      60 </span>            :         //printf(&quot;%s&quot;, &quot;Failed to open dictionary file\n&quot;);
+<span class="lineNum">      61 </span><span class="lineNoCov">          0 :         return false;</span>
+<span class="lineNum">      62 </span>            :     }
+<span class="lineNum">      63 </span><span class="lineCov">         11 :     int count=0;</span>
+<span class="lineNum">      64 </span><span class="lineCov">         11 :     int bucket=0;</span>
+<span class="lineNum">      65 </span><span class="lineCov">         11 :     node* n = malloc(sizeof(node));</span>
+<span class="lineNum">      66 </span><span class="lineCov">         11 :     n-&gt;next=NULL;</span>
+<span class="lineNum">      67 </span><span class="lineCov">    1108205 :     while (read_word(word_list, n-&gt;word) != EOF) {</span>
+<span class="lineNum">      68 </span><span class="lineCov">    1108194 :         if (n-&gt;word == NULL) {</span>
+<span class="lineNum">      69 </span>            :             //printf(&quot;%s\n&quot;, &quot;NULL word detected..fishy-fishy..moving on&quot;);
+<span class="lineNum">      70 </span><span class="lineNoCov">          0 :             continue;</span>
+<span class="lineNum">      71 </span>            :         }
+<span class="lineNum">      72 </span><span class="lineCov">    1108194 :         count++;</span>
+<span class="lineNum">      73 </span><span class="lineCov">    1108194 :         bucket = hash_function(n-&gt;word);</span>
+<span class="lineNum">      74 </span>            :         //printf(&quot;%s: %s %s: %d\n&quot;, &quot;Loaded word&quot;, n-&gt;word, &quot;bucket&quot;, bucket);
+<span class="lineNum">      75 </span><span class="lineCov">    1108194 :         if (hashtable[bucket] != NULL) {</span>
+<span class="lineNum">      76 </span><span class="lineCov">    1091214 :             n-&gt;next=hashtable[bucket];</span>
+<span class="lineNum">      77 </span><span class="lineCov">    1091214 :             hashtable[bucket]=n;</span>
+<span class="lineNum">      78 </span>            :         } else {
+<span class="lineNum">      79 </span><span class="lineCov">      16980 :             hashtable[bucket]=n;</span>
+<span class="lineNum">      80 </span>            :         }
+<span class="lineNum">      81 </span><span class="lineCov">    1108194 :         n = malloc(sizeof(node));</span>
+<span class="lineNum">      82 </span><span class="lineCov">    1108194 :         n-&gt;next=NULL;</span>
+<span class="lineNum">      83 </span>            :     }
+<span class="lineNum">      84 </span>            :     // we should free n, in case nothing is read;
+<span class="lineNum">      85 </span><span class="lineCov">         11 :     free (n);</span>
+<span class="lineNum">      86 </span>            : 
+<span class="lineNum">      87 </span>            :     //printf (&quot;%s%d\n&quot;, &quot;Loaded dictionary word count: &quot;, count);
+<span class="lineNum">      88 </span><span class="lineCov">         11 :     fclose(word_list);</span>
+<span class="lineNum">      89 </span><span class="lineCov">         11 :     return true;</span>
+<a name="90"><span class="lineNum">      90 </span>            : }</a>
+<span class="lineNum">      91 </span>            : 
+<span class="lineNum">      92 </span><span class="lineCov">      66911 : bool check_word(const char* word, hashmap_t hashtable[]) {</span>
+<span class="lineNum">      93 </span>            :     //We assume that the word we are checking has already been prepared and all we need is a dictionary compare
+<span class="lineNum">      94 </span>            : 
+<span class="lineNum">      95 </span>            :     //Lower the string
+<span class="lineNum">      96 </span><span class="lineCov">      66911 :     int word_len=strlen(word);</span>
+<span class="lineNum">      97 </span><span class="lineCov">      66911 :     char lower_word[word_len];</span>
+<span class="lineNum">      98 </span><span class="lineCov">     867308 :     for(int i = 0; i&lt;word_len; i++)</span>
+<span class="lineNum">      99 </span><span class="lineCov">     800397 :         lower_word[i] = tolower(word[i]);</span>
+<span class="lineNum">     100 </span><span class="lineCov">      66911 :     lower_word[word_len]='\0';</span>
+<span class="lineNum">     101 </span>            : 
+<span class="lineNum">     102 </span>            :     //which bucket will we search
+<span class="lineNum">     103 </span><span class="lineCov">      66911 :     int bucket = hash_function(lower_word);</span>
+<span class="lineNum">     104 </span>            : 
+<span class="lineNum">     105 </span>            :     //search the bucket linked list for the word
+<span class="lineNum">     106 </span><span class="lineCov">      66911 :     node* list_item = hashtable[bucket];</span>
+<span class="lineNum">     107 </span><span class="lineCov">    3222506 :     while (list_item != NULL) {</span>
+<span class="lineNum">     108 </span><span class="lineCov">    3217388 :         if (strcmp(list_item-&gt;word, lower_word) == 0)</span>
+<span class="lineNum">     109 </span><span class="lineCov">      61793 :             return true;</span>
+<span class="lineNum">     110 </span><span class="lineCov">    3155595 :         list_item=list_item-&gt;next;</span>
+<span class="lineNum">     111 </span>            :     }
+<span class="lineNum">     112 </span><span class="lineCov">       5118 :     return false;</span>
+<a name="113"><span class="lineNum">     113 </span>            : }</a>
+<span class="lineNum">     114 </span>            : 
+<span class="lineNum">     115 </span><span class="lineCov">          6 : int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {</span>
+<span class="lineNum">     116 </span><span class="lineCov">          6 :     int bad_word_count=0;</span>
+<span class="lineNum">     117 </span>            : 
+<span class="lineNum">     118 </span>            :     //reading our file one word at a time
+<span class="lineNum">     119 </span>            :     char word[LENGTH];
+<span class="lineNum">     120 </span><span class="lineCov">      93073 :     while (read_word(fp, word) != EOF) {</span>
+<span class="lineNum">     121 </span>            :         //now lets prepare the word we will be checking
+<span class="lineNum">     122 </span>            :         //printf(&quot;%s: %s\n&quot;, &quot;Original  word: &quot;, word);
+<span class="lineNum">     123 </span>            : 
+<span class="lineNum">     124 </span>            :         char final_word[LENGTH];
+<span class="lineNum">     125 </span>            : 
+<span class="lineNum">     126 </span>            :         //if the word is all numbers it is a correct word, shortcut
+<span class="lineNum">     127 </span><span class="lineCov">      93067 :         int isallnum=1;</span>
+<span class="lineNum">     128 </span><span class="lineCov">      94183 :         for (int i=0; i&lt;strlen(word); i++) {</span>
+<span class="lineNum">     129 </span><span class="lineCov">      93966 :             if (!isdigit(word[i])) {</span>
+<span class="lineNum">     130 </span><span class="lineCov">      92850 :                 isallnum=0;</span>
+<span class="lineNum">     131 </span><span class="lineCov">      92850 :                 break;</span>
+<span class="lineNum">     132 </span>            :             }
+<span class="lineNum">     133 </span>            :         }
+<span class="lineNum">     134 </span><span class="lineCov">      93067 :         if (isallnum == 1)</span>
+<span class="lineNum">     135 </span><span class="lineCov">      26161 :             continue;</span>
+<span class="lineNum">     136 </span>            : 
+<span class="lineNum">     137 </span>            :         //inspect the string left to right
+<span class="lineNum">     138 </span><span class="lineCov">      92850 :         int word_len=strlen(word);</span>
+<span class="lineNum">     139 </span><span class="lineCov">      92850 :         char lr_stage_word[word_len];</span>
+<span class="lineNum">     140 </span><span class="lineCov">      92850 :         int j=0;</span>
+<span class="lineNum">     141 </span><span class="lineCov">      92850 :         int alphanum_flag1=0;</span>
+<span class="lineNum">     142 </span><span class="lineCov">     441042 :         for(int i = 0; i&lt;word_len; i++) {</span>
+<span class="lineNum">     143 </span><span class="lineCov">     348192 :             if (!isalpha(word[i]) &amp;&amp; !isdigit(word[i]) &amp;&amp; alphanum_flag1 == 0 ) //first chars are not alpha, ignoring</span>
+<span class="lineNum">     144 </span><span class="lineCov">      31311 :                 continue;</span>
+<span class="lineNum">     145 </span>            :             else
+<span class="lineNum">     146 </span><span class="lineCov">     316881 :                 alphanum_flag1=1;</span>
+<span class="lineNum">     147 </span>            : 
+<span class="lineNum">     148 </span><span class="lineCov">     316881 :             lr_stage_word[j++]=word[i];</span>
+<span class="lineNum">     149 </span>            :         }
+<span class="lineNum">     150 </span><span class="lineCov">      92850 :         lr_stage_word[j]='\0';</span>
+<span class="lineNum">     151 </span>            : 
+<span class="lineNum">     152 </span>            : 
+<span class="lineNum">     153 </span>            :         //inspect the string right to left
+<span class="lineNum">     154 </span>            : 
+<span class="lineNum">     155 </span><span class="lineCov">      92850 :         int lr_stage_word_len=strlen(lr_stage_word);</span>
+<span class="lineNum">     156 </span><span class="lineCov">      92850 :         char rl_stage_word[lr_stage_word_len];</span>
+<span class="lineNum">     157 </span><span class="lineCov">      92850 :         int y=0;</span>
+<span class="lineNum">     158 </span><span class="lineCov">      92850 :         int alphanum_flag2=0;</span>
+<span class="lineNum">     159 </span><span class="lineCov">     409731 :         for (int x = lr_stage_word_len - 1; x&gt;=0; x--) {</span>
+<span class="lineNum">     160 </span><span class="lineCov">     316881 :             if (!isalpha(lr_stage_word[x]) &amp;&amp; !isdigit(lr_stage_word[x]) &amp;&amp; alphanum_flag2 == 0  ) //last chars are not alpha, ignoring</span>
+<span class="lineNum">     161 </span><span class="lineCov">      16512 :                 continue;</span>
+<span class="lineNum">     162 </span>            :             else
+<span class="lineNum">     163 </span><span class="lineCov">     300369 :                 alphanum_flag2=1;</span>
+<span class="lineNum">     164 </span>            : 
+<span class="lineNum">     165 </span><span class="lineCov">     300369 :             rl_stage_word[y++]=lr_stage_word[x];</span>
+<span class="lineNum">     166 </span>            :         }
+<span class="lineNum">     167 </span><span class="lineCov">      92850 :         rl_stage_word[y]='\0';</span>
+<span class="lineNum">     168 </span>            : 
+<span class="lineNum">     169 </span>            :         //ok now reverse the string and ready
+<span class="lineNum">     170 </span><span class="lineCov">      92850 :         int rl_stage_word_len=strlen(rl_stage_word);</span>
+<span class="lineNum">     171 </span><span class="lineCov">      92850 :         int b = 0 ;</span>
+<span class="lineNum">     172 </span><span class="lineCov">     393219 :         for ( int c = rl_stage_word_len -1; c&gt;=0; c--){</span>
+<span class="lineNum">     173 </span><span class="lineCov">     300369 :             final_word[b++]=rl_stage_word[c];</span>
+<span class="lineNum">     174 </span>            :         }
+<span class="lineNum">     175 </span><span class="lineCov">      92850 :         final_word[b]='\0';</span>
+<span class="lineNum">     176 </span>            : 
+<span class="lineNum">     177 </span>            :         //printf(&quot;%s: %s\n&quot;, &quot;Final word: &quot;, final_word);
+<span class="lineNum">     178 </span>            : 
+<span class="lineNum">     179 </span>            :         //don't check if final word is blank
+<span class="lineNum">     180 </span><span class="lineCov">      92850 :         if (strlen(final_word) == 0)</span>
+<span class="lineNum">     181 </span><span class="lineCov">      25944 :             continue;</span>
+<span class="lineNum">     182 </span>            : 
+<span class="lineNum">     183 </span><span class="lineCov">      66906 :         if (check_word(final_word, hashtable) == true) {</span>
+<span class="lineNum">     184 </span>            :             //printf(&quot;%s %s\n&quot;, final_word, &quot;is correct&quot;);
+<span class="lineNum">     185 </span>            :         }
+<span class="lineNum">     186 </span>            :         else {
+<span class="lineNum">     187 </span>            :             //printf(&quot;%s %s\n&quot;, final_word, &quot;is wrong&quot;);
+<span class="lineNum">     188 </span><span class="lineCov">       5115 :             if ( bad_word_count &lt; 1000) { //make sure we are not overflowing the misspelled buffer with all those creative spellings</span>
+<span class="lineNum">     189 </span><span class="lineCov">       3005 :                 misspelled[bad_word_count] = malloc(</span>
+<span class="lineNum">     190 </span><span class="lineCov">       3005 :                         sizeof(char) * strlen(final_word) + 1); //gota make sure to add 1 here to account for \0</span>
+<span class="lineNum">     191 </span><span class="lineCov">       3005 :                 strcpy(misspelled[bad_word_count], final_word);</span>
+<span class="lineNum">     192 </span><span class="lineCov">       3005 :                 bad_word_count++;</span>
+<span class="lineNum">     193 </span>            :             }
+<span class="lineNum">     194 </span>            :         }
+<span class="lineNum">     195 </span>            : 
+<span class="lineNum">     196 </span>            :     }
+<span class="lineNum">     197 </span>            :     //release memory before we return
+<span class="lineNum">     198 </span><span class="lineCov">      12006 :     for (int i=0; i&lt;HASH_SIZE; i++)  {</span>
+<span class="lineNum">     199 </span><span class="lineCov">      12000 :         if (hashtable[i] != NULL)</span>
+<span class="lineNum">     200 </span><span class="lineCov">      11310 :             freebucket(hashtable[i]);</span>
+<span class="lineNum">     201 </span>            :     }
+<span class="lineNum">     202 </span>            : 
+<span class="lineNum">     203 </span><span class="lineCov">          6 :     return bad_word_count;</span>
+<span class="lineNum">     204 </span>            : }
+<span class="lineNum">     205 </span>            : 
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.13</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
