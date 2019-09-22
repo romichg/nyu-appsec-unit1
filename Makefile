@@ -33,4 +33,4 @@ codecov:
 	gcc --coverage -Wall -o spell_test_coverage test_main.c spell.c dictionary.c dictionary.h -lcheck -lm -lrt -lpthread -lsubunit
 	./spell_test_coverage
 	lcov --capture --directory ./ --output-file coverage.info
-	genhtml coverage.info --output-directory code_coverage 
+	genhtml coverage.info --output-directory docs 
