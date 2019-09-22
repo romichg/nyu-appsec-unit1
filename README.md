@@ -2,3 +2,4 @@
 
 Code for CS - GY 9163 Application Security Fall 2019 - Unit 1 Assignemnt
 
+Check out our code coverage stats [![Code Coverage]](https://romichg.github.io/nyu-appsec-unit1/)
